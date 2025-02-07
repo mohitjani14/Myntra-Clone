@@ -57,3 +57,10 @@ jobs:
         run: |
           $HOME/.docker/cli-plugins/docker-scout quickview hitanshidarji/myntra-app:latest
           $HOME/.docker/cli-plugins/docker-scout cves hitanshidarji/myntra-app:latest
+
+        deploy:
+         needs: build-analyze-scan
+         runs-on: self-hosted # Use your self-hosted runner label here  
+         
+      - name: Run the container
+        run: docker run -d --name myntra -p 3000:3000 sevenajay/myntra:latest
