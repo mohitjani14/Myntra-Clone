@@ -42,14 +42,14 @@ jobs:
           $HOME/.docker/cli-plugins/docker-scout quickview fs://.
           $HOME/.docker/cli-plugins/docker-scout cves fs://.
 
-      # 🏗️ Build and Push Docker Image
+     # 🏗️ Build and Push Docker Image
       - name: Docker Build and Push
         run: |
-          docker build -t myntra .
-          docker tag myntra sevenajay/myntra:latest hitanshidarji/myntra-app:latest
-          docker push hitanshidarji/myntra-app:latest
+          docker build -t sevenajay/myntra:latest .
+          docker push sevenajay/myntra:latest
         env:
           DOCKER_CLI_ACI: 1
+
 
       # 🛡️ Docker Scout Scan on Image
       - name: Docker Scout Image Scan
