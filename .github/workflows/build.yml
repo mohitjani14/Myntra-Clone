@@ -27,21 +27,33 @@ jobs:
       #   timeout-minutes: 5
       #   env:
       #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
-      - name: Docker Login
-        run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+    -name: docker-scout-scan:
+     runs-on: ubuntu-latest
+     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Docker Scout
+        run: |
+          curl -fsSL https://download.docker.com/linux/static/stable/x86_64/docker-scout -o /usr/local/bin/docker-scout
+          chmod +x /usr/local/bin/docker-scout
+          docker-scout --version  # Verify installation
+
       - name: Docker Scout Scan
         run: |
-         docker-scout quickview fs://.
-         docker-scout cves fs://.
+          docker-scout quickview fs://.
+          docker-scout cves fs://.
+
       - name: Docker build and push
         run: |
-         docker build -t myntra .
-         docker tag myntra sevenajay/myntra:latest
-         docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
-         docker push sevenajay/myntra:latest
-         env:
+          docker build -t myntra .
+          docker tag myntra sevenajay/myntra:latest
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+          docker push sevenajay/myntra:latest
+        env:
           DOCKER_CLI_ACI: 1
+
       - name: Docker Scout Image Scan
         run: |
-         docker-scout quickview sevenajay/myntra:latest
-         docker-scout cves sevenajay/myntra:latest
+          docker-scout quickview sevenajay/myntra:latest
+          docker-scout cves sevenajay/myntra:latest
