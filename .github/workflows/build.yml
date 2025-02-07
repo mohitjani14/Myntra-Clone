@@ -9,6 +9,7 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -24,6 +25,8 @@ jobs:
       - name: Install Dependencies
         run: npm install  # Modify this based on your project needs
 
+      - name: Docker Login
+        run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
       # 🛠️ Install Docker Scout
       - name: Install Docker Scout
         run: |
