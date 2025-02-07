@@ -27,9 +27,10 @@ jobs:
       # 🛠️ Install Docker Scout
       - name: Install Docker Scout
         run: |
-          curl -fsSL https://download.docker.com/linux/static/stable/x86_64/docker-scout -o /usr/local/bin/docker-scout
-          chmod +x /usr/local/bin/docker-scout
-          docker-scout --version  # Verify installation
+      - name: Install Docker Scout
+        run: |
+         docker scout install
+         docker scout --version  # Verify installation
 
       # 🔍 Run Docker Scout Scan
       - name: Run Docker Scout Scan
