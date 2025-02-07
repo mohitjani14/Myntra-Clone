@@ -46,13 +46,13 @@ jobs:
       - name: Docker Build and Push
         run: |
           docker build -t myntra .
-          docker tag myntra sevenajay/myntra:latest
-          docker push sevenajay/myntra:latest
+          docker tag myntra sevenajay/myntra:latest hitanshidarji/myntra:latest
+          docker push hitanshidarji/myntra:latest
         env:
           DOCKER_CLI_ACI: 1
 
       # 🛡️ Docker Scout Scan on Image
       - name: Docker Scout Image Scan
         run: |
-          $HOME/.docker/cli-plugins/docker-scout quickview sevenajay/myntra:latest
-          $HOME/.docker/cli-plugins/docker-scout cves sevenajay/myntra:latest
+          $HOME/.docker/cli-plugins/docker-scout quickview hitanshidarji/myntra:latest
+          $HOME/.docker/cli-plugins/docker-scout cves hitanshidarji/myntra:latest
