@@ -26,28 +26,27 @@ jobs:
         run: npm install  # Modify this based on your project needs
 
       - name: Docker Login
-        run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
       # 🛠️ Install Docker Scout
       - name: Install Docker Scout
         run: |
-         curl -fsSL https://raw.githubusercontent.com/docker/scout-cli/main/install.sh | sh
-         echo "$HOME/.docker/cli-plugins" >> $GITHUB_PATH  # Add to PATH
-         chmod +x $HOME/.docker/cli-plugins/docker-scout
-         $HOME/.docker/cli-plugins/docker-scout --version  # Verify installation
-
+          curl -fsSL https://raw.githubusercontent.com/docker/scout-cli/main/install.sh | sh
+          echo "$HOME/.docker/cli-plugins" >> $GITHUB_PATH
+          chmod +x $HOME/.docker/cli-plugins/docker-scout
+        shell: bash
 
       # 🔍 Run Docker Scout Scan
       - name: Run Docker Scout Scan
         run: |
-          docker-scout quickview fs://.
-          docker-scout cves fs://.
+          $HOME/.docker/cli-plugins/docker-scout quickview fs://.
+          $HOME/.docker/cli-plugins/docker-scout cves fs://.
 
       # 🏗️ Build and Push Docker Image
       - name: Docker Build and Push
         run: |
           docker build -t myntra .
           docker tag myntra sevenajay/myntra:latest
-          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
           docker push sevenajay/myntra:latest
         env:
           DOCKER_CLI_ACI: 1
@@ -55,5 +54,5 @@ jobs:
       # 🛡️ Docker Scout Scan on Image
       - name: Docker Scout Image Scan
         run: |
-          docker-scout quickview sevenajay/myntra:latest
-          docker-scout cves sevenajay/myntra:latest
+          $HOME/.docker/cli-plugins/docker-scout quickview sevenajay/myntra:latest
+          $HOME/.docker/cli-plugins/docker-scout cves sevenajay/myntra:latest
