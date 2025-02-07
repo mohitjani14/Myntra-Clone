@@ -42,7 +42,7 @@ jobs:
           $HOME/.docker/cli-plugins/docker-scout quickview fs://.
           $HOME/.docker/cli-plugins/docker-scout cves fs://.
 
-     # 🏗️ Build and Push Docker Image
+      # 🏗️ Build and Push Docker Image
       - name: Docker Build and Push
         run: |
           docker build -t sevenajay/myntra:latest .
@@ -51,16 +51,16 @@ jobs:
         env:
           DOCKER_CLI_ACI: 1
 
-
       # 🛡️ Docker Scout Scan on Image
       - name: Docker Scout Image Scan
         run: |
           $HOME/.docker/cli-plugins/docker-scout quickview hitanshidarji/myntra-app:latest
           $HOME/.docker/cli-plugins/docker-scout cves hitanshidarji/myntra-app:latest
 
-        deploy:
-         needs: build-analyze-scan
-         runs-on: self-hosted # Use your self-hosted runner label here  
-         
+  deploy:
+    needs: build  # Correctly referencing the 'build' job
+    runs-on: self-hosted  # Use your self-hosted runner label here  
+
+    steps:
       - name: Run the container
-        run: docker run -d --name myntra -p 3000:3000 sevenajay/myntra:latest
+        run: docker run -d --name myntra -p 3000:3000 hitanshidarji/myntra-app:latest
