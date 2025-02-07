@@ -25,10 +25,12 @@ jobs:
         run: npm install  # Modify this based on your project needs
 
       # 🛠️ Install Docker Scout
-      - name: Install Docker Scout
+      - name: Install Docker Scout Manually
         run: |
-         docker scout install
-         docker scout --version  # Verify installation
+         curl -fsSL https://raw.githubusercontent.com/docker/scout-cli/main/install.sh | sh
+         sudo mv bin/docker-scout /usr/local/bin/
+         chmod +x /usr/local/bin/docker-scout
+         docker-scout --version  # Verify installation
 
       # 🔍 Run Docker Scout Scan
       - name: Run Docker Scout Scan
