@@ -46,7 +46,8 @@ jobs:
       - name: Docker Build and Push
         run: |
           docker build -t sevenajay/myntra:latest .
-          docker push sevenajay/myntra:latest hitanshidarji/myntra-app:latest
+          docker tag sevenajay/myntra:latest hitanshidarji/myntra-app:latest
+          docker push hitanshidarji/myntra-app:latest
         env:
           DOCKER_CLI_ACI: 1
 
