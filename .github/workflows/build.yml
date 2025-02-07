@@ -5,7 +5,6 @@ on:
     branches:
       - main
 
-
 jobs:
   build:
     name: Build
@@ -13,47 +12,44 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0  # Shallow clones should be disabled for better analysis
+
       - uses: sonarsource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
       - name: NPM Install
         run: npm install # Add your specific npm install command
 
-      # If you wish to fail your job when the Quality Gate is red, uncomment the
-      # following lines. This would typically be used to fail a deployment.
-      # - uses: sonarsource/sonarqube-quality-gate-action@master
-      #   timeout-minutes: 5
-      #   env:
-      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} 
-    -name: docker-scout-scan:
-     runs-on: ubuntu-latest
-     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Install Docker Scout
-        run: |
-          curl -fsSL https://download.docker.com/linux/static/stable/x86_64/docker-scout -o /usr/local/bin/docker-scout
-          chmod +x /usr/local/bin/docker-scout
-          docker-scout --version  # Verify installation
-
+      # Docker Scout Scan Job
       - name: Docker Scout Scan
-        run: |
-          docker-scout quickview fs://.
-          docker-scout cves fs://.
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout code
+            uses: actions/checkout@v3
 
-      - name: Docker build and push
-        run: |
-          docker build -t myntra .
-          docker tag myntra sevenajay/myntra:latest
-          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-          docker push sevenajay/myntra:latest
-        env:
-          DOCKER_CLI_ACI: 1
+          - name: Install Docker Scout
+            run: |
+              curl -fsSL https://download.docker.com/linux/static/stable/x86_64/docker-scout -o /usr/local/bin/docker-scout
+              chmod +x /usr/local/bin/docker-scout
+              docker-scout --version  # Verify installation
 
-      - name: Docker Scout Image Scan
-        run: |
-          docker-scout quickview sevenajay/myntra:latest
-          docker-scout cves sevenajay/myntra:latest
+          - name: Run Docker Scout Scan
+            run: |
+              docker-scout quickview fs://.
+              docker-scout cves fs://.
+
+          - name: Docker Build and Push
+            run: |
+              docker build -t myntra .
+              docker tag myntra sevenajay/myntra:latest
+              echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+              docker push sevenajay/myntra:latest
+            env:
+              DOCKER_CLI_ACI: 1
+
+          - name: Docker Scout Image Scan
+            run: |
+              docker-scout quickview sevenajay/myntra:latest
+              docker-scout cves sevenajay/myntra:latest
