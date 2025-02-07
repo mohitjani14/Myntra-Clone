@@ -10,46 +10,45 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout Repository
+        uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for better analysis
+          fetch-depth: 0  # Ensure a full clone for better analysis
 
-      - uses: sonarsource/sonarqube-scan-action@master
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
-      - name: NPM Install
-        run: npm install # Add your specific npm install command
+      - name: Install Dependencies
+        run: npm install  # Modify this based on your project needs
 
-      # Docker Scout Scan Job
-      - name: Docker Scout Scan
-        runs-on: ubuntu-latest
-        steps:
-          - name: Checkout code
-            uses: actions/checkout@v3
+      # 🛠️ Install Docker Scout
+      - name: Install Docker Scout
+        run: |
+          curl -fsSL https://download.docker.com/linux/static/stable/x86_64/docker-scout -o /usr/local/bin/docker-scout
+          chmod +x /usr/local/bin/docker-scout
+          docker-scout --version  # Verify installation
 
-          - name: Install Docker Scout
-            run: |
-              curl -fsSL https://download.docker.com/linux/static/stable/x86_64/docker-scout -o /usr/local/bin/docker-scout
-              chmod +x /usr/local/bin/docker-scout
-              docker-scout --version  # Verify installation
+      # 🔍 Run Docker Scout Scan
+      - name: Run Docker Scout Scan
+        run: |
+          docker-scout quickview fs://.
+          docker-scout cves fs://.
 
-          - name: Run Docker Scout Scan
-            run: |
-              docker-scout quickview fs://.
-              docker-scout cves fs://.
+      # 🏗️ Build and Push Docker Image
+      - name: Docker Build and Push
+        run: |
+          docker build -t myntra .
+          docker tag myntra sevenajay/myntra:latest
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+          docker push sevenajay/myntra:latest
+        env:
+          DOCKER_CLI_ACI: 1
 
-          - name: Docker Build and Push
-            run: |
-              docker build -t myntra .
-              docker tag myntra sevenajay/myntra:latest
-              echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-              docker push sevenajay/myntra:latest
-            env:
-              DOCKER_CLI_ACI: 1
-
-          - name: Docker Scout Image Scan
-            run: |
-              docker-scout quickview sevenajay/myntra:latest
-              docker-scout cves sevenajay/myntra:latest
+      # 🛡️ Docker Scout Scan on Image
+      - name: Docker Scout Image Scan
+        run: |
+          docker-scout quickview sevenajay/myntra:latest
+          docker-scout cves sevenajay/myntra:latest
