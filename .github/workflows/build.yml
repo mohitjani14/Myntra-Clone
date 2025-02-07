@@ -27,8 +27,6 @@ jobs:
       # 🛠️ Install Docker Scout
       - name: Install Docker Scout
         run: |
-      - name: Install Docker Scout
-        run: |
          docker scout install
          docker scout --version  # Verify installation
 
