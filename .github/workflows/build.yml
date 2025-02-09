@@ -59,7 +59,7 @@ jobs:
 
   deploy:
     needs: build  # Correctly referencing the 'build' job
-    runs-on: self-hosted  # Use your self-hosted runner label here  
+    runs-on: self-hosted  # Use your self-hosted runner label here
 
     steps:
       - name: Run the container
